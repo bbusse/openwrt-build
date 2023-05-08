@@ -1,0 +1,38 @@
+---
+name: Build OpenWrt
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+    branches:
+      - '**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  build-linux-kernel:
+    strategy:
+      matrix:
+        flavour: ["x86_64"]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Checkout image-builder
+        uses: actions/checkout@v3
+        with:
+          repository: 'OpsBoost/image-builder'
+          ref: 'dev'
+          path: 'image-builder'
+
+      - name: Build
+        run: |
+          sudo ./image-builder/image-builder install
+          image-builder build openwrt ${{ matrix.flavour }}
