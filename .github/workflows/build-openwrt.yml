@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-linux-kernel:
+  build-openwrt:
     strategy:
       matrix:
         flavour: ["x86_64"]
@@ -36,3 +36,11 @@ jobs:
         run: |
           sudo ./image-builder/image-builder install
           image-builder build openwrt ${{ matrix.flavour }}
+          pwd
+          ls -al
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: openwrt-x86-64
+          path: openwrt/build_dir/target-x86_64_musl/linux-x86_64/tmp/openwrt-x86-64-*.img.gz
