@@ -70,4 +70,3 @@ jobs:
         with:
           name: linux-buildbot-prebuilt-tools
           path: openwrt/tools.tar
-          retention-days: 1
