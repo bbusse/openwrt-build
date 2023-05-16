@@ -61,13 +61,11 @@ jobs:
           path: openwrt/.config
 
       - name: Archive prebuilt tools
-        if: inputs.generate_prebuilt_artifacts == true
         shell: su buildbot -c "sh -e {0}"
         working-directory: openwrt
         run: tar -cf tools.tar staging_dir/host build_dir/host
 
       - name: Upload prebuilt tools
-        if: inputs.generate_prebuilt_artifacts == true
         uses: actions/upload-artifact@v3
         with:
           name: linux-buildbot-prebuilt-tools
