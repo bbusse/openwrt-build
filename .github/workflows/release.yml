@@ -19,15 +19,22 @@ jobs:
       uses: lewagon/wait-on-check-action@v1.3.1
       with:
         ref: ${{ github.ref }}
-        check-regexp: build-linux-kernel*
+        check-regexp: build-openwrt*
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         wait-interval: 10
+
+    - name: Download artifacts
+      id: download-artifacts
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: build-openwrt.yml
 
     - name: Release
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
+        title: openwrt
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         prerelease: false
         automatic_release_tag: "latest"
         files: |
-          /output/bzImage-*
+          openwrt-x86-64-generic-ext4-combined-efi.img.gz
