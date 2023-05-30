@@ -46,6 +46,12 @@ jobs:
         working-directory: openwrt
         run: make tools/install -j$(nproc) BUILD_LOG=1 || ret=$? .github/workflows/scripts/show_build_failures.sh
 
+      - name: Upload tools
+        uses: actions/upload-artifact@v3
+        with:
+          name: tools
+          path: openwrt/tools
+
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v3
