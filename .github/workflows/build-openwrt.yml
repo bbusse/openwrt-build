@@ -46,7 +46,7 @@ jobs:
           path: openwrt/build_dir/target-x86_64_musl/linux-x86_64/tmp/openwrt-x86-64-*.img.gz
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: openwrt-x86_64-packages
           path: openwrt/bin/targets/x86/64/packages/*
