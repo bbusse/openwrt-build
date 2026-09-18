@@ -1,5 +1,8 @@
 ---
-name: Build OpenWrt
+name: Build and Release OpenWrt
+
+# One file: release needs the same build the push job runs, and as two
+# workflows both had to declare build-openwrt.
 
 on:
   push:
@@ -7,6 +10,9 @@ on:
       - '**.md'
     branches:
       - '**'
+    tags:
+      - 'rc-*'
+      - 'release-*'
   pull_request:
     paths-ignore:
       - '**.md'
@@ -15,24 +21,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-linux-kernel:
+  build-openwrt:
     strategy:
+      fail-fast: false
       matrix:
-        flavour: ["x86_64"]
+        include:
+          - flavour: x86_64
+            openwrt_branch: dev
+          # ALFA Network AP120C (ath79/generic), ported on top of
+          # openwrt-25.12 in the fork's ap120c branch.
+          - flavour: ap120c
+            openwrt_branch: ap120c
+    uses: bbusse/github-workflows/.github/workflows/build-openwrt.yml@dev
+    with:
+      flavour: ${{ matrix.flavour }}
+      openwrt_branch: ${{ matrix.openwrt_branch }}
+      artifact_name: openwrt
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Checkout image-builder
-        uses: actions/checkout@v3
-        with:
-          repository: 'OpsBoost/image-builder'
-          ref: 'dev'
-          path: 'image-builder'
-
-      - name: Build
-        run: |
-          sudo ./image-builder/image-builder install
-          image-builder build openwrt ${{ matrix.flavour }}
+  release:
+    needs:
+      - build-openwrt
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    permissions:
+      contents: write
+    uses: bbusse/github-workflows/.github/workflows/release.yml@dev
+    with:
+      artifact_name: openwrt
+      binary_name: openwrt
+      release_branch: main
+    secrets: inherit
